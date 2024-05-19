@@ -24,6 +24,88 @@ This library is ideal for applications requiring fair and efficient task managem
 npm install fair-task-pool
 ```
 
+## Usage Example
+
+Some of the details are omitted for simplicity, complete example see: [example/app.ts](./example/app.ts)
+
+```typescript
+import { FairTaskPool } from 'fair-task-pool'
+import { Request, Response, NextFunction } from 'express'
+
+let fairTaskPool = new FairTaskPool({
+  capacity: 20,
+  flushQueueWhenEmpty: true,
+})
+
+function createThread(req: Request, res: Response, next: NextFunction) {
+  let { user_id } = getJWTPayload(req)
+  fairTaskPool.enqueue(user_id, async () => {
+    try {
+      let input = createThreadParser.parse(req.body)
+      let result = await service.createThread({
+        user_id,
+        content: input.content,
+      })
+      res.json(result)
+    } catch (error) {
+      next(error)
+    }
+  })
+}
+
+function getThread(req: Request, res: Response, next: NextFunction) {
+  let queue_key: number | string
+  try {
+    let payload = getJWTPayload(req)
+    queue_key = payload.user_id
+  } catch {
+    // all non authenticated users share the same quota
+    queue_key = 'guest'
+  }
+  fairTaskPool.enqueue(queue_key, async () => {
+    try {
+      let input = getThreadParser.parse(req.params)
+      let result = await service.getThread({ id: input.id })
+      res.json(result)
+    } catch (error) {
+      next(error)
+    }
+  })
+}
+```
+
+## Typescript Signature
+
+```typescript
+/** @description can be used for per-user task queue */
+export class FairTaskPool {
+  constructor(options?: {
+    /** @description max number of pending tasks per-key */
+    /** @default unlimited if undefined */
+    capacity?: number
+
+    /** @default false */
+    flushQueueWhenEmpty?: boolean
+  })
+
+  /** @throws TaskQueueFullError when exceed */
+  enqueue(key: Key, task: Task): void
+
+  getPendingTaskCount(key: Key): number
+
+  getQueueSize(): number
+}
+
+type Key = string | number
+
+/** @description the task should not throw errors. */
+export type Task = () => void | Promise<void>
+
+export class TaskQueueFullError extends Error {
+  capacity: number
+}
+```
+
 ## License
 
 This project is licensed with [BSD-2-Clause](./LICENSE)
