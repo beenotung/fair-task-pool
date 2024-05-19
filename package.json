@@ -1,11 +1,34 @@
 {
   "name": "fair-task-pool",
-  "version": "1.0.0",
-  "description": "",
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "main": "index.js",
+  "version": "0.0.0",
+  "description": "Fairly schedule async tasks and prevent any since user/subject from monopolizing the system resources.",
+  "keywords": [
+    "task-queue",
+    "async",
+    "queue",
+    "fair-scheduling",
+    "scheduling",
+    "concurrent",
+    "rate-limiting",
+    "typescript",
+    "per-use-queue"
+  ],
+  "author": "Beeno Tung <aabbcc1241@yahoo.com.hk> (https://beeno-tung.surge.sh)",
+  "license": "BSD-2-Clause",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/beenotung/fair-task-pool.git"
+  },
+  "homepage": "https://github.com/beenotung/fair-task-pool#readme",
+  "bugs": {
+    "url": "https://github.com/beenotung/fair-task-pool/issues"
+  },
+  "main": "./fair-task-pool.js",
+  "types": "./fair-task-pool.d.ts",
+  "files": [
+    "./fair-task-pool.js",
+    "./fair-task-pool.d.ts"
+  ],
   "scripts": {
     "test": "tsc --noEmit && npm run mocha",
     "mocha": "ts-mocha *.spec.ts",

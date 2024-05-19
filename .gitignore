@@ -8,3 +8,5 @@ dist/
 .env
 *.tgz
 .DS_Store
+fair-task-pool.d.ts
+fair-task-pool.js
