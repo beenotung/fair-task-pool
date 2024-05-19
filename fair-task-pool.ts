@@ -39,7 +39,7 @@ export class FairTaskPool {
 }
 
 /** @description the task should not throw errors. */
-type Task = () => void | Promise<void>
+export type Task = () => void | Promise<void>
 
 interface TaskQueue {
   onEmpty: null | (() => void)
