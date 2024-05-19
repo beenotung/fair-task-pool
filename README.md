@@ -32,13 +32,20 @@ Some of the details are omitted for simplicity, complete example see: [example/a
 import { FairTaskPool } from 'fair-task-pool'
 import { Request, Response, NextFunction } from 'express'
 
+let MaxQueueSize = 20
+
 let fairTaskPool = new FairTaskPool({
-  capacity: 20,
+  capacity: MaxQueueSize,
   flushQueueWhenEmpty: true,
 })
 
 function createThread(req: Request, res: Response, next: NextFunction) {
   let { user_id } = getJWTPayload(req)
+  res.setHeader('X-RateLimit-Limit', MaxQueueSize)
+  res.setHeader(
+    'X-RateLimit-Remaining',
+    MaxQueueSize - fairTaskPool.getPendingTaskCount(user_id),
+  )
   fairTaskPool.enqueue(user_id, async () => {
     try {
       let input = createThreadParser.parse(req.body)
@@ -62,6 +69,11 @@ function getThread(req: Request, res: Response, next: NextFunction) {
     // all non authenticated users share the same quota
     queue_key = 'guest'
   }
+  res.setHeader('X-RateLimit-Limit', MaxQueueSize)
+  res.setHeader(
+    'X-RateLimit-Remaining',
+    MaxQueueSize - fairTaskPool.getPendingTaskCount(queue_key),
+  )
   fairTaskPool.enqueue(queue_key, async () => {
     try {
       let input = getThreadParser.parse(req.params)
