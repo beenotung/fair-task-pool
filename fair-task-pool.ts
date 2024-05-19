@@ -108,7 +108,7 @@ class LimitedTaskQueue extends UnlimitedTaskQueue implements TaskQueue {
 }
 
 export class TaskQueueFullError extends Error {
-  status = 429 as const
+  statusCode = 429 as const
   constructor(public capacity: number) {
     super('exceed task queue capacity of ' + capacity)
   }
