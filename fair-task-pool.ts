@@ -20,7 +20,12 @@ export class FairTaskPool {
     queue.enqueue(task)
   }
 
-  getQueue(key: Key): TaskQueue {
+  getPendingTaskCount(key: Key): number {
+    let queue = this.queues.get(key)
+    return queue ? queue.pendingTaskCount : 0
+  }
+
+  private getQueue(key: Key): TaskQueue {
     let queue = this.queues.get(key)
     if (!queue) {
       let onEmpty = this.options.flushQueueWhenEmpty
@@ -42,6 +47,7 @@ export class FairTaskPool {
 export type Task = () => void | Promise<void>
 
 interface TaskQueue {
+  pendingTaskCount: number
   onEmpty: null | (() => void)
   enqueue(task: Task): void
 }
@@ -55,6 +61,10 @@ class UnlimitedTaskQueue implements TaskQueue {
 
   constructor(options: { onEmpty: null | (() => void) }) {
     this.onEmpty = options.onEmpty
+  }
+
+  get pendingTaskCount(): number {
+    return this.queue.length
   }
 
   enqueue(task: Task) {

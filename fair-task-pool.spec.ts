@@ -11,6 +11,7 @@ function testCapacity(key: number) {
   for (let i = 1; i <= capacity + 1; i++) {
     taskQueue.enqueue(key, dummyTask)
   }
+  expect(taskQueue.getPendingTaskCount(key)).to.equals(capacity)
   expect(() => taskQueue.enqueue(key, dummyTask)).to.throws(TaskQueueFullError)
 }
 
@@ -29,6 +30,7 @@ context('FairTaskPool TestSuit', () => {
           taskQueue.enqueue(dummyKey, dummyTask)
           setTimeout(() => tick(i + 1))
         } else {
+          expect(taskQueue.getPendingTaskCount(dummyKey)).to.equals(0)
           setTimeout(done)
         }
       }
