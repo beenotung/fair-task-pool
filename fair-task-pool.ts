@@ -2,7 +2,7 @@ type Key = string | number
 
 /** @description can be used for per-user task queue */
 export class FairTaskPool {
-  queues = new Map<Key, TaskQueue>()
+  private queues = new Map<Key, TaskQueue>()
 
   constructor(
     public options: {
@@ -15,6 +15,7 @@ export class FairTaskPool {
     } = {},
   ) {}
 
+  /** @throws TaskQueueFullError when exceed */
   enqueue(key: Key, task: Task): void {
     let queue = this.getQueue(key)
     queue.enqueue(task)
@@ -23,6 +24,10 @@ export class FairTaskPool {
   getPendingTaskCount(key: Key): number {
     let queue = this.queues.get(key)
     return queue ? queue.pendingTaskCount : 0
+  }
+
+  getQueueSize() {
+    return this.queues.size
   }
 
   private getQueue(key: Key): TaskQueue {

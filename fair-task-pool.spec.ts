@@ -56,16 +56,16 @@ context('FairTaskPool TestSuit', () => {
       let taskQueue = new FairTaskPool({ capacity })
       taskQueue.enqueue(dummyKey, dummyTask)
       setTimeout(() => {
-        expect(taskQueue.queues.size).to.equals(1)
+        expect(taskQueue.getQueueSize()).to.equals(1)
         done()
       })
     })
     it('should flush queues when specified', done => {
       let taskQueue = new FairTaskPool({ capacity, flushQueueWhenEmpty: true })
       taskQueue.enqueue(dummyKey, dummyTask)
-      expect(taskQueue.queues.size).to.equals(1)
+      expect(taskQueue.getQueueSize()).to.equals(1)
       setTimeout(() => {
-        expect(taskQueue.queues.size).to.equals(0)
+        expect(taskQueue.getQueueSize()).to.equals(0)
         done()
       })
     })
