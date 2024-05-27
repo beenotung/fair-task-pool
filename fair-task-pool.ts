@@ -59,6 +59,7 @@ export type Task = () => void | Promise<void>
 interface TaskQueue {
   pendingTaskCount: number
   onEmpty?: () => void
+  /** @throws TaskQueueFullError when exceed */
   enqueue(task: Task): void
 }
 
@@ -104,6 +105,7 @@ class LimitedTaskQueue extends UnlimitedTaskQueue implements TaskQueue {
     this.capacity = options.capacity
   }
 
+  /** @throws TaskQueueFullError when exceed */
   enqueue(task: Task) {
     if (this.queue.length >= this.capacity) {
       throw new TaskQueueFullError(this.capacity)
