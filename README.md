@@ -88,6 +88,8 @@ function getThread(req: Request, res: Response, next: NextFunction) {
 
 ## Typescript Signature
 
+Types for main class `FairTaskPool`:
+
 ```typescript
 /** @description can be used for per-user task queue */
 export class FairTaskPool {
@@ -120,6 +122,27 @@ export type Task = () => void | Promise<void>
 
 export class TaskQueueFullError extends Error {
   capacity: number
+}
+```
+
+Types for helper class `TaskQueue`:
+
+```typescript
+export interface TaskQueue {
+  pendingTaskCount: number
+  onEmpty?: () => void
+  /** @throws TaskQueueFullError when exceed */
+  enqueue(task: Task): void
+}
+
+export class UnlimitedTaskQueue implements TaskQueue {
+  queue: Task[]
+  constructor(options: { onEmpty?: () => void })
+}
+
+export class LimitedTaskQueue extends UnlimitedTaskQueue implements TaskQueue {
+  capacity: number
+  constructor(options: { onEmpty?: () => void; capacity: number })
 }
 ```
 

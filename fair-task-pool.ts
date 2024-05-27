@@ -56,14 +56,14 @@ export class FairTaskPool {
 /** @description the task should not throw errors. */
 export type Task = () => void | Promise<void>
 
-interface TaskQueue {
+export interface TaskQueue {
   pendingTaskCount: number
   onEmpty?: () => void
   /** @throws TaskQueueFullError when exceed */
   enqueue(task: Task): void
 }
 
-class UnlimitedTaskQueue implements TaskQueue {
+export class UnlimitedTaskQueue implements TaskQueue {
   queue: Task[] = []
 
   running = false
@@ -97,7 +97,7 @@ class UnlimitedTaskQueue implements TaskQueue {
   }
 }
 
-class LimitedTaskQueue extends UnlimitedTaskQueue implements TaskQueue {
+export class LimitedTaskQueue extends UnlimitedTaskQueue implements TaskQueue {
   capacity: number
 
   constructor(options: { onEmpty?: () => void; capacity: number }) {
