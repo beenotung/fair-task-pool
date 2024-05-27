@@ -92,15 +92,20 @@ function getThread(req: Request, res: Response, next: NextFunction) {
 /** @description can be used for per-user task queue */
 export class FairTaskPool {
   constructor(options?: {
-    /** @description max number of pending tasks per-key */
-    /** @default unlimited if undefined */
+    /**
+     * @description max number of pending tasks per-key
+     * @default unlimited if undefined
+     * */
     capacity?: number
 
     /** @default false */
     flushQueueWhenEmpty?: boolean
   })
 
-  /** @throws TaskQueueFullError when exceed */
+  /**
+   * @description dispatch the task to corresponding TaskQueue partitioned by the `key`
+   * @throws TaskQueueFullError when exceed
+   * */
   enqueue(key: Key, task: Task): void
 
   getPendingTaskCount(key: Key): number

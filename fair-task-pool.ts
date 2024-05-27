@@ -6,8 +6,10 @@ export class FairTaskPool {
 
   constructor(
     public options: {
-      /** @description max number of pending tasks per-key */
-      /** @default unlimited if undefined */
+      /**
+       * @description max number of pending tasks per-key
+       * @default unlimited if undefined
+       * */
       capacity?: number
 
       /** @default false */
@@ -15,7 +17,10 @@ export class FairTaskPool {
     } = {},
   ) {}
 
-  /** @throws TaskQueueFullError when exceed */
+  /**
+   * @description dispatch the task to corresponding TaskQueue partitioned by the `key`
+   * @throws TaskQueueFullError when exceed
+   * */
   enqueue(key: Key, task: Task): void {
     let queue = this.getQueue(key)
     queue.enqueue(task)
