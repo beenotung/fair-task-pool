@@ -11,7 +11,7 @@
     "concurrent",
     "rate-limiting",
     "typescript",
-    "per-use-queue"
+    "per-user-queue"
   ],
   "author": "Beeno Tung <aabbcc1241@yahoo.com.hk> (https://beeno-tung.surge.sh)",
   "license": "BSD-2-Clause",
