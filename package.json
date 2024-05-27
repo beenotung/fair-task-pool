@@ -1,6 +1,6 @@
 {
   "name": "fair-task-pool",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Fairly schedule async tasks and prevent any since user/subject from monopolizing the system resources.",
   "keywords": [
     "task-queue",
