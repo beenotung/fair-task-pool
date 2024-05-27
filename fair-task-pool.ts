@@ -42,7 +42,7 @@ export class FairTaskPool {
         ? () => {
             this.queues.delete(key)
           }
-        : null
+        : undefined
       let capacity = this.options.capacity
       queue = capacity
         ? new LimitedTaskQueue({ onEmpty, capacity })
@@ -58,7 +58,7 @@ export type Task = () => void | Promise<void>
 
 interface TaskQueue {
   pendingTaskCount: number
-  onEmpty: null | (() => void)
+  onEmpty?: () => void
   enqueue(task: Task): void
 }
 
@@ -67,10 +67,10 @@ class UnlimitedTaskQueue implements TaskQueue {
 
   running = false
 
-  onEmpty: null | (() => void)
+  onEmpty?: () => void
 
-  constructor(options: { onEmpty: null | (() => void) }) {
-    this.onEmpty = options.onEmpty
+  constructor(options?: { onEmpty?: () => void }) {
+    this.onEmpty = options?.onEmpty
   }
 
   get pendingTaskCount(): number {
@@ -99,7 +99,7 @@ class UnlimitedTaskQueue implements TaskQueue {
 class LimitedTaskQueue extends UnlimitedTaskQueue implements TaskQueue {
   capacity: number
 
-  constructor(options: { onEmpty: null | (() => void); capacity: number }) {
+  constructor(options: { onEmpty?: () => void; capacity: number }) {
     super(options)
     this.capacity = options.capacity
   }
