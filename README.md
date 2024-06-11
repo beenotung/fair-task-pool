@@ -108,7 +108,7 @@ export class FairTaskPool {
    * @description dispatch the task to corresponding TaskQueue partitioned by the `key`
    * @throws TaskQueueFullError when exceed
    * */
-  enqueue(key: Key, task: Task): void
+  enqueue<T>(key: Key, task: Task<T>): Promise<T>
 
   getPendingTaskCount(key: Key): number
 
@@ -118,7 +118,7 @@ export class FairTaskPool {
 type Key = string | number
 
 /** @description the task should not throw errors. */
-export type Task = () => void | Promise<void>
+export type Task<T> = () => T | Promise<T>
 
 export class TaskQueueFullError extends Error {
   capacity: number
@@ -132,11 +132,10 @@ export interface TaskQueue {
   pendingTaskCount: number
   onEmpty?: () => void
   /** @throws TaskQueueFullError when exceed */
-  enqueue(task: Task): void
+  enqueue<T>(task: Task<T>): Promise<T>
 }
 
 export class UnlimitedTaskQueue implements TaskQueue {
-  queue: Task[]
   constructor(options: { onEmpty?: () => void })
 }
 

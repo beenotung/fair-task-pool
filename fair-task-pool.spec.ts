@@ -1,5 +1,10 @@
 import { expect } from 'chai'
-import { FairTaskPool, TaskQueueFullError } from './fair-task-pool'
+import {
+  FairTaskPool,
+  LimitedTaskQueue,
+  TaskQueueFullError,
+  UnlimitedTaskQueue,
+} from './fair-task-pool'
 
 function dummyTask() {
   // dummy function
@@ -14,6 +19,33 @@ function testCapacity(key: number) {
   expect(taskQueue.getPendingTaskCount(key)).to.equals(capacity)
   expect(() => taskQueue.enqueue(key, dummyTask)).to.throws(TaskQueueFullError)
 }
+
+context('TaskQueue TestSuit', () => {
+  context('UnlimitedTaskQueue', () => {
+    it('should returns the result in promise', async () => {
+      let queue = new UnlimitedTaskQueue()
+      let p = queue.enqueue(() => 1)
+      expect(p).not.undefined
+      expect(p.then).not.undefined
+      expect(await p).to.equals(1)
+
+      p = queue.enqueue(() => Promise.resolve(2))
+      expect(await p).to.equals(2)
+    })
+  })
+  context('LimitedTaskQueue', () => {
+    it('should returns the result in promise', async () => {
+      let queue = new LimitedTaskQueue({ capacity: 3 })
+      let p = queue.enqueue(() => 1)
+      expect(p).not.undefined
+      expect(p.then).not.undefined
+      expect(await p).to.equals(1)
+
+      p = queue.enqueue(() => Promise.resolve(2))
+      expect(await p).to.equals(2)
+    })
+  })
+})
 
 context('FairTaskPool TestSuit', () => {
   context('single user tests', () => {

@@ -21,9 +21,9 @@ export class FairTaskPool {
    * @description dispatch the task to corresponding TaskQueue partitioned by the `key`
    * @throws TaskQueueFullError when exceed
    * */
-  enqueue(key: Key, task: Task): void {
+  enqueue<T>(key: Key, task: Task<T>): Promise<T> {
     let queue = this.getQueue(key)
-    queue.enqueue(task)
+    return queue.enqueue(task)
   }
 
   getPendingTaskCount(key: Key): number {
@@ -53,18 +53,18 @@ export class FairTaskPool {
   }
 }
 
-/** @description the task should not throw errors. */
-export type Task = () => void | Promise<void>
+/** @description the task is executed with try-catch. */
+export type Task<T> = () => T | Promise<T>
 
 export interface TaskQueue {
   pendingTaskCount: number
   onEmpty?: () => void
   /** @throws TaskQueueFullError when exceed */
-  enqueue(task: Task): void
+  enqueue<T>(task: Task<T>): Promise<T>
 }
 
 export class UnlimitedTaskQueue implements TaskQueue {
-  queue: Task[] = []
+  queue: Task<void>[] = []
 
   running = false
 
@@ -78,9 +78,17 @@ export class UnlimitedTaskQueue implements TaskQueue {
     return this.queue.length
   }
 
-  enqueue(task: Task) {
-    this.queue.push(task)
-    this.tick()
+  enqueue<T>(task: Task<T>): Promise<T> {
+    return new Promise<T>((resolve, reject) => {
+      this.queue.push(async () => {
+        try {
+          resolve(await task())
+        } catch (error) {
+          reject(error)
+        }
+      })
+      this.tick()
+    })
   }
 
   async tick() {
@@ -106,11 +114,11 @@ export class LimitedTaskQueue extends UnlimitedTaskQueue implements TaskQueue {
   }
 
   /** @throws TaskQueueFullError when exceed */
-  enqueue(task: Task) {
+  enqueue<T>(task: Task<T>): Promise<T> {
     if (this.queue.length >= this.capacity) {
       throw new TaskQueueFullError(this.capacity)
     }
-    super.enqueue(task)
+    return super.enqueue(task)
   }
 }
 
